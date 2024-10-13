@@ -1,0 +1,5 @@
+openai
+azure-ai-evaluation
+python-dotenv
+bs4
+promptflow[azure]
