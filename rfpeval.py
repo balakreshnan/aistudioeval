@@ -89,7 +89,7 @@ def main():
     similarity_evaluator = SimilarityEvaluator(model_config)
 
     results = evaluate(
-        evaluation_name="rfp_evaluation",
+        evaluation_name="rfpevaluation",
         data="datarfp.jsonl",
         target=extractrfpresults,
         evaluators={
