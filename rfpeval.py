@@ -48,7 +48,7 @@ def parse_json(data):
 
 def main():
     
-    citationtxt = extractrfpresults("Provide summary of Resources for Railway projects with 200 words?")
+    #citationtxt = extractrfpresults("Provide summary of Resources for Railway projects with 200 words?")
 
     # print(citationtxt)
     model_config = {
@@ -71,16 +71,16 @@ def main():
         # "azure_crendential": credential,
     }
 
-    relevance_evaluator = RelevanceEvaluator(model_config)
+    #relevance_evaluator = RelevanceEvaluator(model_config)
 
-    relevance_evaluator(
-        response=citationtxt,
-        context="summary of Resources for Railway projects.",
-        query="Provide summary of Resources for Railway projects with 200 words?",
-    )
+    #relevance_evaluator(
+    #    response=citationtxt,
+    #    context="summary of Resources for Railway projects.",
+    #    query="Provide summary of Resources for Railway projects with 200 words?",
+    #)
     # pprint(relevance_evaluator)
 
-    prompty_path = os.path.join("./", "rfp.prompty")
+    # prompty_path = os.path.join("./", "rfp.prompty")
     content_safety_evaluator = ContentSafetyEvaluator(azure_ai_project)
     relevance_evaluator = RelevanceEvaluator(model_config)
     coherence_evaluator = CoherenceEvaluator(model_config)
@@ -95,6 +95,9 @@ def main():
         evaluators={
             "relevance": relevance_evaluator,
         },
+        evaluator_config={
+            "relevance": {"response": "${target.response}", "context": "${data.context}", "query": "${data.query}"},
+        },
         #evaluators={
         #    "content_safety": content_safety_evaluator,
         #    "coherence": coherence_evaluator,
@@ -102,10 +105,7 @@ def main():
         #    "groundedness": groundedness_evaluator,
         #    "fluency": fluency_evaluator,
         #    "similarity": similarity_evaluator,
-        #},
-        evaluator_config={
-            "relevance": {"response": "${target.response}", "context": "${data.context}", "query": "${data.query}"},
-        },
+        #},        
         #evaluator_config={
         #    "content_safety": {"query": "${data.query}", "response": "${target.response}"},
         #    "coherence": {"response": "${target.response}", "query": "${data.query}"},

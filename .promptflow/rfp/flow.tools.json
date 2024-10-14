@@ -1,0 +1,20 @@
+{
+  "package": {},
+  "code": {
+    "rfp.prompty": {
+      "type": "llm",
+      "inputs": {
+        "query": {
+          "type": [
+            "string"
+          ]
+        },
+        "response": {
+          "type": [
+            "string"
+          ]
+        }
+      }
+    }
+  }
+}
