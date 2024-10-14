@@ -1,0 +1,35 @@
+---
+name: RFP Evaluator
+description: Apology Evaluator for QA scenario
+model:
+  api: chat
+  configuration:
+    type: azure_openai
+    connection: open_ai_connection
+    azure_deployment: gpt-4o-2
+  parameters:
+    temperature: 0.0
+    response_format: { "type":"json_object"}
+inputs:
+  query:
+    type: string
+  response:
+    type: string
+outputs:
+  apology:
+    type: int
+---
+system:
+You are an AI tool that determines if, in a chat conversation, the assistant for RFP responses.
+Provide summarized content based on content provided.
+
+# Documents
+{{documents}}
+
+{% for item in chat_history %}
+{{item.role}}
+{{item.content}}
+{% endfor %}
+
+user:
+{{chat_input}}

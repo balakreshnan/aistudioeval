@@ -12,6 +12,10 @@ from azure.ai.evaluation import (
     GroundednessEvaluator,
     FluencyEvaluator,
     SimilarityEvaluator,
+    ViolenceEvaluator,
+    SexualEvaluator,
+    SelfHarmEvaluator,
+    HateUnfairnessEvaluator,
 )
 from dotenv import load_dotenv
 
@@ -51,8 +55,9 @@ def main():
         "azure_endpoint": os.environ.get("AZURE_OPENAI_ENDPOINT"),
         "api_key": os.environ.get("AZURE_OPENAI_API_KEY"),
         "azure_deployment": os.environ.get("AZURE_OPENAI_DEPLOYMENT"),
+        "api_version": os.environ.get("AZURE_OPENAI_API_VERSION"),
     }
-    
+
     try:
         credential = DefaultAzureCredential()
         credential.get_token("https://management.azure.com/.default")
@@ -60,10 +65,10 @@ def main():
         print(ex)
 
     azure_ai_project={
-        "subscription_id": os.environ.get("subscription_id"),
-        "resource_group_name": os.environ.get("resource_group_name"),
-        "project_name": os.environ.get("project_name"),
-        "azure_crendential": credential,
+        "subscription_id": os.environ.get("AZURE_SUBSCRIPTION_ID"),
+        "resource_group_name": os.environ.get("AZURE_RESOURCE_GROUP"),
+        "project_name": os.environ.get("AZUREAI_PROJECT_NAME"),
+        # "azure_crendential": credential,
     }
 
     relevance_evaluator = RelevanceEvaluator(model_config)
@@ -75,6 +80,14 @@ def main():
     )
     # pprint(relevance_evaluator)
 
+    prompty_path = os.path.join("./", "rfp.prompty")
+    content_safety_evaluator = ContentSafetyEvaluator(azure_ai_project)
+    relevance_evaluator = RelevanceEvaluator(model_config)
+    coherence_evaluator = CoherenceEvaluator(model_config)
+    groundedness_evaluator = GroundednessEvaluator(model_config)
+    fluency_evaluator = FluencyEvaluator(model_config)
+    similarity_evaluator = SimilarityEvaluator(model_config)
+
     results = evaluate(
         evaluation_name="rfp_evaluation",
         data="datarfp.jsonl",
@@ -82,14 +95,34 @@ def main():
         evaluators={
             "relevance": relevance_evaluator,
         },
+        #evaluators={
+        #    "content_safety": content_safety_evaluator,
+        #    "coherence": coherence_evaluator,
+        #    "relevance": relevance_evaluator,
+        #    "groundedness": groundedness_evaluator,
+        #    "fluency": fluency_evaluator,
+        #    "similarity": similarity_evaluator,
+        #},
         evaluator_config={
             "relevance": {"response": "${target.response}", "context": "${data.context}", "query": "${data.query}"},
         },
+        #evaluator_config={
+        #    "content_safety": {"query": "${data.query}", "response": "${target.response}"},
+        #    "coherence": {"response": "${target.response}", "query": "${data.query}"},
+        #    "relevance": {"response": "${target.response}", "context": "${data.context}", "query": "${data.query}"},
+        #    "groundedness": {
+        #        "response": "${target.response}",
+        #        "context": "${data.context}",
+        #        "query": "${data.query}",
+        #    },
+        #    "fluency": {"response": "${target.response}", "context": "${data.context}", "query": "${data.query}"},
+        #    "similarity": {"response": "${target.response}", "context": "${data.context}", "query": "${data.query}"},
+        #},
         # azure_ai_project=azure_ai_project,
         output_path="./rsoutputmetrics.json",
     )
     # pprint(results)
     parse_json(results)
 
-if __name__ == "__main__":
+if __name__ == "__main__":    
     main()

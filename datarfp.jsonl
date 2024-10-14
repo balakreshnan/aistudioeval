@@ -1,3 +1,3 @@
-{"query":"Provide summary of Resources for Railway projects with 200 words?", "context":"summary of Resources for Railway projects", "response":"1776"}
-{"query":"Provide summary of Resources for Railway construction projects with 200 words?", "context":"summary of Resources for Railway construction projects", "response":"Paris"}
-{"query":"Provide summary of Resources for Construction projects with 200 words?", "context":"summary of Resources for Construction projects", "response":"Roger Federer"}
+{"query":"Provide summary of Resources for Railway projects with 200 words?", "context":"summary of Resources for Railway projects", "response":"1776", "ground_truth": "1776"}
+{"query":"Provide summary of Resources for Railway construction projects with 200 words?", "context":"summary of Resources for Railway construction projects", "response":"Paris", "ground_truth": "Paris"}
+{"query":"Provide summary of Resources for Construction projects with 200 words?", "context":"summary of Resources for Construction projects", "response":"Roger Federer", "ground_truth": "Roger Federer"}

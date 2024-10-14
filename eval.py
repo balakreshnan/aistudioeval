@@ -23,9 +23,9 @@ def main():
     }
 
     azure_ai_project={
-        "subscription_id": os.environ.get("subscription_id"),
-        "resource_group_name": os.environ.get("resource_group_name"),
-        "project_name": os.environ.get("project_name"),
+        "subscription_id": os.environ.get("AZURE_SUBSCRIPTION_ID"),
+        "resource_group_name": os.environ.get("AZURE_RESOURCE_GROUP"),
+        "project_name": os.environ.get("AZUREAI_PROJECT_NAME"),
     }
 
     relevance_evaluator = RelevanceEvaluator(model_config)

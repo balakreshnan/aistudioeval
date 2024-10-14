@@ -3,10 +3,6 @@ __pycache__/
 local.settings.json
 test
 .venv/
-env.env
-web/
-cpu-int4-rtn-block-32-acc-level-4/
-yolov5s.pt
-runs/
-cuda-int4-rtn-block-32/
+.env
+.promptflow/
 pdf/
