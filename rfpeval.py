@@ -48,7 +48,9 @@ def parse_json(data):
 
 def main():
     
-    #citationtxt = extractrfpresults("Provide summary of Resources for Railway projects with 200 words?")
+    citationtxt = extractrfpresults("Provide summary of Resources for Railway projects with 200 words?")
+
+    print('Citation Text:', citationtxt)
 
     # print(citationtxt)
     #model_config = {
