@@ -26,17 +26,12 @@ css = """
 """
 
 client = AzureOpenAI(
-  azure_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT_VISION"), 
-  api_key=os.getenv("AZURE_OPENAI_KEY_VISION"),  
-  api_version="2024-05-01-preview"
-  #api_version="2024-02-01"
-  #api_version="2023-12-01-preview"
-  #api_version="2023-09-01-preview"
+  azure_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT"), 
+  api_key=os.getenv("AZURE_OPENAI_API_KEY"),  
+  api_version="2024-05-01-preview",
 )
 
-#model_name = "gpt-4-turbo"
-#model_name = "gpt-35-turbo-16k"
-model_name = "gpt-4o-g"
+model_name = os.getenv("AZURE_OPENAI_DEPLOYMENT")
 
 search_endpoint = os.getenv("AZURE_AI_SEARCH_ENDPOINT")
 search_key = os.getenv("AZURE_AI_SEARCH_KEY")
