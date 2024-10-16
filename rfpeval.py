@@ -48,6 +48,8 @@ def parse_json(data):
 
 def main():
     
+    # Load .env file
+    load_dotenv()
     citationtxt = extractrfpresults("Provide summary of Resources for Railway projects with 200 words?")
 
     # print('Citation Text:', citationtxt)
@@ -74,14 +76,14 @@ def main():
         # "azure_crendential": credential,
     }
 
-    #relevance_evaluator = RelevanceEvaluator(model_config)
+    relevance_evaluator = RelevanceEvaluator(model_config)
 
-    #relevance_evaluator(
-    #    response=citationtxt,
-    #    context="summary of Resources for Railway projects.",
-    #    query="Provide summary of Resources for Railway projects with 200 words?",
-    #)
-    # pprint(relevance_evaluator)
+    relevance_evaluator(
+        response=citationtxt,
+        context="summary of Resources for Railway projects.",
+        query="Provide summary of Resources for Railway projects with 200 words?",
+    )
+    pprint(relevance_evaluator)
 
     # prompty_path = os.path.join("./", "rfp.prompty")
     content_safety_evaluator = ContentSafetyEvaluator(azure_ai_project)
@@ -91,41 +93,41 @@ def main():
     fluency_evaluator = FluencyEvaluator(model_config)
     similarity_evaluator = SimilarityEvaluator(model_config)
 
-    results = evaluate(
-        evaluation_name="rfpevaluation",
-        data="datarfp.jsonl",
-        target=extractrfpresults,
-        #evaluators={
-        #    "relevance": relevance_evaluator,
-        #},
-        #evaluator_config={
-        #    "relevance": {"response": "${target.response}", "context": "${data.context}", "query": "${data.query}"},
-        #},
-        evaluators={
-            "content_safety": content_safety_evaluator,
-            "coherence": coherence_evaluator,
-            "relevance": relevance_evaluator,
-            "groundedness": groundedness_evaluator,
-            "fluency": fluency_evaluator,
-            "similarity": similarity_evaluator,
-        },        
-        evaluator_config={
-            "content_safety": {"query": "${data.query}", "response": "${target.response}"},
-            "coherence": {"response": "${target.response}", "query": "${data.query}"},
-            "relevance": {"response": "${target.response}", "context": "${data.context}", "query": "${data.query}"},
-            "groundedness": {
-                "response": "${target.response}",
-                "context": "${data.context}",
-                "query": "${data.query}",
-            },
-            "fluency": {"response": "${target.response}", "context": "${data.context}", "query": "${data.query}"},
-            "similarity": {"response": "${target.response}", "context": "${data.context}", "query": "${data.query}"},
-        },
-        azure_ai_project=azure_ai_project,
-        output_path="./rsoutputmetrics.json",
-    )
+    # results = evaluate(
+    #     evaluation_name="rfpevaluation",
+    #     data="datarfp.jsonl",
+    #     target=extractrfpresults,
+    #     #evaluators={
+    #     #    "relevance": relevance_evaluator,
+    #     #},
+    #     #evaluator_config={
+    #     #    "relevance": {"response": "${target.response}", "context": "${data.context}", "query": "${data.query}"},
+    #     #},
+    #     evaluators={
+    #     #    "content_safety": content_safety_evaluator,
+    #     #    "coherence": coherence_evaluator,
+    #         "relevance": relevance_evaluator,
+    #     #    "groundedness": groundedness_evaluator,
+    #     #    "fluency": fluency_evaluator,
+    #     #    "similarity": similarity_evaluator,
+    #     },        
+    #     evaluator_config={
+    #         "content_safety": {"query": "${data.query}", "response": "${target.response}"},
+    #         "coherence": {"response": "${target.response}", "query": "${data.query}"},
+    #         "relevance": {"response": "${target.response}", "context": "${data.context}", "query": "${data.query}"},
+    #         "groundedness": {
+    #             "response": "${target.response}",
+    #             "context": "${data.context}",
+    #             "query": "${data.query}",
+    #         },
+    #         "fluency": {"response": "${target.response}", "context": "${data.context}", "query": "${data.query}"},
+    #         "similarity": {"response": "${target.response}", "context": "${data.context}", "query": "${data.query}"},
+    #     },
+    #     azure_ai_project=azure_ai_project,
+    #     output_path="./rsoutputmetrics.json",
+    # )
     # pprint(results)
-    parse_json(results)
+    # parse_json(results)
     print("Done")
 
 if __name__ == "__main__":    

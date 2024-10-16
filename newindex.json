@@ -1,0 +1,116 @@
+{
+    "name": "cogsrch-index-profile-vector_large",
+    "fields": [
+      {
+        "name": "id",
+        "type": "Edm.String",
+        "facetable": false,
+        "filterable": false,
+        "key": true,
+        "retrievable": true,
+        "searchable": true,
+        "sortable": false,
+        "analyzer": "standard.lucene",
+        "indexAnalyzer": null,
+        "searchAnalyzer": null,
+        "synonymMaps": [],
+        "fields": []
+      },
+      {
+        "name": "title",
+        "type": "Edm.String",
+        "facetable": false,
+        "filterable": false,
+        "key": false,
+        "retrievable": true,
+        "searchable": true,
+        "sortable": false,
+        "analyzer": "standard.lucene",
+        "indexAnalyzer": null,
+        "searchAnalyzer": null,
+        "synonymMaps": [],
+        "fields": []
+      },
+      {
+        "name": "chunk",
+        "type": "Edm.String",
+        "facetable": false,
+        "filterable": false,
+        "retrievable": true,
+        "sortable": false,
+        "analyzer": null,
+        "indexAnalyzer": null,
+        "searchAnalyzer": null,
+        "synonymMaps": [],
+        "fields": []
+      },
+      {
+        "name": "chunkVector",
+        "type": "Collection(Edm.Single)",
+        "searchable": true,
+        "retrievable": true,
+        "stored": true,
+        "dimensions": 1536,
+        "vectorSearchProfile": "vector-profile-1"
+      },
+      {
+        "name": "name",
+        "type": "Edm.String",
+        "facetable": false,
+        "filterable": false,
+        "retrievable": true,
+        "sortable": false,
+        "analyzer": null,
+        "indexAnalyzer": null,
+        "searchAnalyzer": null,
+        "synonymMaps": [],
+        "fields": []
+      },
+      {
+        "name": "location",
+        "type": "Edm.String",
+        "facetable": false,
+        "filterable": false,
+        "retrievable": true,
+        "sortable": false,
+        "analyzer": null,
+        "indexAnalyzer": null,
+        "searchAnalyzer": null,
+        "synonymMaps": [],
+        "fields": []
+      },
+      {
+        "name": "page_num",
+        "type": "Edm.Int32",
+        "facetable": true,
+        "filterable": true,
+        "retrievable": true,
+        "sortable": true,
+        "analyzer": null,
+        "indexAnalyzer": null,
+        "searchAnalyzer": null,
+        "synonymMaps": [],
+        "fields": []
+      }
+    ],
+    "vectorSearch": {
+        "algorithms": [
+            {
+                "name": "hsnw-1",
+                "kind": "hnsw",
+                "hnswParameters": {
+                    "m": 4,
+                    "efConstruction": 400,
+                    "efSearch": 500,
+                    "metric": "cosine"
+                }
+            }
+        ],
+        "profiles": [
+            {
+                "name": "vector-profile-1",
+                "algorithm": "hnsw-1"
+            }
+        ]
+    }
+  }

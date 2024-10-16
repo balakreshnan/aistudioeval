@@ -5,3 +5,5 @@ bs4
 azure-identity
 pandas
 promptflow[azure]
+qrcode[pil]
+azure-search-documents
