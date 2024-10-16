@@ -50,15 +50,8 @@ def main():
     
     citationtxt = extractrfpresults("Provide summary of Resources for Railway projects with 200 words?")
 
-    print('Citation Text:', citationtxt)
+    # print('Citation Text:', citationtxt)
 
-    # print(citationtxt)
-    #model_config = {
-    #    "azure_endpoint": os.environ.get("AZURE_OPENAI_ENDPOINT"),
-    #    "api_key": os.environ.get("AZURE_OPENAI_API_KEY"),
-    #    "azure_deployment": os.environ.get("AZURE_OPENAI_DEPLOYMENT"),
-    #    "api_version": os.environ.get("AZURE_OPENAI_API_VERSION"),
-    #}
     model_config = {
         "azure_endpoint": os.getenv("AZURE_OPENAI_ENDPOINT"),
         "api_key": os.getenv("AZURE_OPENAI_API_KEY"),
@@ -73,12 +66,6 @@ def main():
     except Exception as ex:
         print(ex)
 
-    #azure_ai_project={
-    #    "subscription_id": os.environ.get("AZURE_SUBSCRIPTION_ID"),
-    #    "resource_group_name": os.environ.get("AZURE_RESOURCE_GROUP"),
-    #    "project_name": os.environ.get("AZUREAI_PROJECT_NAME"),
-    #    # "azure_crendential": credential,
-    #}
 
     azure_ai_project={
         "subscription_id": os.getenv("AZURE_SUBSCRIPTION_ID"),

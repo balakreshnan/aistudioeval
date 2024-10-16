@@ -45,7 +45,7 @@ citationtxt = ""
 def processpdfwithprompt(query: str):
     returntxt = ""
     citationtxt = ""
-    selected_optionsearch = "simple"
+    selected_optionsearch = "vector_semantic_hybrid"
     message_text = [
     {"role":"system", "content":"""you are provided with instruction on what to do. Be politely, and provide positive tone answers. 
      answer only from data source provided. unable to find answer, please respond politely and ask for more information.
@@ -74,7 +74,7 @@ def processpdfwithprompt(query: str):
                     "include_contexts": ["citations"],
                     "top_n_documents": 5,
                     "query_type": selected_optionsearch,
-                    "semantic_configuration": "my-semantic-config",
+                    "semantic_configuration": "vec-semantic-configuration",
                     "embedding_dependency": {
                         "type": "deployment_name",
                         "deployment_name": "text-embedding-ada-002"
