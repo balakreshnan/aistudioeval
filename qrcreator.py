@@ -2,7 +2,8 @@ import qrcode
 
 def main():
     # Data for the QR code (this could be a URL, text, etc.)
-    data = "https://microsoft.benevity.org/campaigns/82923"
+    #data = "https://microsoft.benevity.org/campaigns/82923"
+    data = "https://www.amazon.com/dp/B0DK7S55BB"
 
     # Create a QR code instance
     qr = qrcode.QRCode(
@@ -20,9 +21,9 @@ def main():
     img = qr.make_image(fill="black", back_color="white")
 
     # Save the image
-    img.save("diwalievent2024.png")
+    img.save("aiforfoodbook2024.png")
 
-    print("QR code generated and saved as 'diwalievent2024.png'")
+    print("QR code generated and saved as 'aiforfoodbook2024.png'")
 
 if __name__ == "__main__":
     main()

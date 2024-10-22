@@ -9,35 +9,50 @@ import requests
 import pandas as pd
 from azure.core.credentials import AzureKeyCredential
 from azure.search.documents import SearchClient
-from azure.search.documents.indexes import SearchIndexClient
-from azure.search.documents.indexes.models import SearchIndex
+from azure.search.documents.indexes import SearchIndexClient, SearchIndexerClient
 from azure.search.documents.indexes.models import (
-    ComplexField,
-    CorsOptions,
-    SearchIndex,
-    ScoringProfile,
+    AzureMachineLearningSkill,
+    AzureOpenAIEmbeddingSkill,
+    AzureOpenAIModelName,
+    AzureOpenAIVectorizer,
+    AzureOpenAIParameters,
+    ExhaustiveKnnAlgorithmConfiguration,
+    ExhaustiveKnnParameters,
+    FieldMapping,
+    HnswAlgorithmConfiguration,
+    HnswParameters,
+    IndexProjectionMode,
+    InputFieldMappingEntry,
+    OutputFieldMappingEntry,
+    ScalarQuantizationCompressionConfiguration,
+    ScalarQuantizationParameters,
+    SearchField,
     SearchFieldDataType,
-    SimpleField,
-    SearchableField,
+    SearchIndex,
+    SearchIndexer,
+    SearchIndexerDataContainer,
+    SearchIndexerDataSourceConnection,
+    SearchIndexerIndexProjectionSelector,
+    SearchIndexerIndexProjections,
+    SearchIndexerIndexProjectionsParameters,
+    SearchIndexerSkillset,
+    SemanticConfiguration,
+    SemanticField,
+    SemanticPrioritizedFields,
+    SemanticSearch,
+    SplitSkill,
+    VectorSearch,
+    VectorSearchAlgorithmMetric,
+    VectorSearchProfile,
 )
-    from azure.search.documents.indexes import SearchIndexClient
-    from azure.search.documents.indexes.models import (
-        SimpleField,
-        SearchFieldDataType,
-        SearchableField,
-        SearchField,
-        VectorSearch,
-        HnswAlgorithmConfiguration,
-        VectorSearchProfile,
-        SemanticConfiguration,
-        SemanticPrioritizedFields,
-        SemanticField,
-        SemanticSearch,
-        SearchIndex,
-        AzureOpenAIVectorizer,
-        AzureOpenAIParameters
-    )
-from azure.search.documents import SearchClient
+from azure.search.documents.models import (
+    HybridCountAndFacetMode,
+    HybridSearch,
+    SearchScoreThreshold,
+    VectorSimilarityThreshold,
+    VectorizableTextQuery,
+    VectorizedQuery
+)
 import os
 
 # Load .env file
@@ -232,22 +247,29 @@ def createnewindex(new_index_name):
     index_client = SearchIndexClient(
         endpoint=endpoint, credential=credential)
     fields = [
-        SimpleField(name="id", type=SearchFieldDataType.String, key=True, sortable=True, filterable=True, facetable=True),
-        SearchableField(name="title", type=SearchFieldDataType.String),
-        SearchableField(name="name", type=SearchFieldDataType.String),
-        SearchableField(name="chunk", type=SearchFieldDataType.String,
+        SearchField(name="id", type=SearchFieldDataType.String, key=True, sortable=True, filterable=True, facetable=True),
+        SearchField(name="title", type=SearchFieldDataType.String, sortable=True, filterable=True, facetable=True),
+        SearchField(name="name", type=SearchFieldDataType.String, sortable=True, filterable=True, facetable=True),
+        SearchField(name="chunk", type=SearchFieldDataType.String,
                         filterable=True),
         SearchField(name="chunkVector", type=SearchFieldDataType.Collection(SearchFieldDataType.Single),
                     searchable=True, vector_search_dimensions=3072, vector_search_profile_name="myHnswProfile"),
-        SearchableField(name="location", type=SearchFieldDataType.String),
-        SearchableField(name="page_num", type=SearchFieldDataType.int32),
+        SearchField(name="location", type=SearchFieldDataType.String),
+        SearchField(name="page_num", type=SearchFieldDataType.Int32),
     ]
 
+    # https://github.com/Azure/azure-search-vector-samples/blob/main/demo-python/code/e2e-demos/azure-ai-search-e2e-build-demo.ipynb
     # Configure the vector search configuration  
     vector_search = VectorSearch(
         algorithms=[
             HnswAlgorithmConfiguration(
-                name="myHnsw"
+                name="myHnsw",
+                parameters=HnswParameters(
+                    m=4,
+                    ef_construction=400,
+                    ef_search=500,
+                    metric=VectorSearchAlgorithmMetric.COSINE,
+                ),
             )
         ],
         profiles=[
@@ -260,6 +282,7 @@ def createnewindex(new_index_name):
         vectorizers=[
             AzureOpenAIVectorizer(
                 name="myVectorizer",
+                kind="azureOpenAI",
                 azure_open_ai_parameters=AzureOpenAIParameters(
                     resource_uri=os.getenv("AZURE_OPENAI_ENDPOINT"),
                     deployment_id="text-embedding-3-large",
@@ -276,8 +299,8 @@ def createnewindex(new_index_name):
         name="my-semantic-config",
         prioritized_fields=SemanticPrioritizedFields(
             title_field=SemanticField(field_name="title"),
-            keywords_fields=[SemanticField(field_name="chunk")],
-            content_fields=[SemanticField(field_name="name")]
+            keywords_fields=[SemanticField(field_name="name")],
+            content_fields=[SemanticField(field_name="chunk")]
         )
     )
 
