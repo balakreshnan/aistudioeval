@@ -26,7 +26,9 @@ from azure.search.documents.indexes.models import (
     OutputFieldMappingEntry,
     ScalarQuantizationCompressionConfiguration,
     ScalarQuantizationParameters,
+    SimpleField,
     SearchField,
+    SearchableField,
     SearchFieldDataType,
     SearchIndex,
     SearchIndexer,
@@ -54,6 +56,9 @@ from azure.search.documents.models import (
     VectorizedQuery
 )
 import os
+from azure.identity import DefaultAzureCredential
+from azure.core.credentials import AzureKeyCredential
+from azure.search.documents.models import VectorizedQuery
 
 # Load .env file
 load_dotenv()
@@ -65,7 +70,8 @@ api_key = os.getenv("AZURE_AI_SEARCH_API_KEY")
 
 # Create the Search Client
 endpoint = f"{service_name}"
-credential = AzureKeyCredential(api_key)
+#credential = AzureKeyCredential(api_key)
+credential = AzureKeyCredential(os.getenv("AZURE_AI_SEARCH_API_KEY", "")) if len(os.getenv("AZURE_AI_SEARCH_API_KEY", "")) > 0 else DefaultAzureCredential()
 
 # Function to retrieve current embeddings from the index
 #def retrieve_embeddings_from_index(index_name):
@@ -247,15 +253,15 @@ def createnewindex(new_index_name):
     index_client = SearchIndexClient(
         endpoint=endpoint, credential=credential)
     fields = [
-        SearchField(name="id", type=SearchFieldDataType.String, key=True, sortable=True, filterable=True, facetable=True),
-        SearchField(name="title", type=SearchFieldDataType.String, sortable=True, filterable=True, facetable=True),
-        SearchField(name="name", type=SearchFieldDataType.String, sortable=True, filterable=True, facetable=True),
-        SearchField(name="chunk", type=SearchFieldDataType.String,
+        SimpleField(name="id", type=SearchFieldDataType.String, key=True, sortable=True, filterable=True, facetable=True),
+        SearchableField(name="title", type=SearchFieldDataType.String, sortable=True, filterable=True, facetable=True),
+        SearchableField(name="name", type=SearchFieldDataType.String, sortable=True, filterable=True, facetable=True),
+        SearchableField(name="chunk", type=SearchFieldDataType.String,
                         filterable=True),
         SearchField(name="chunkVector", type=SearchFieldDataType.Collection(SearchFieldDataType.Single),
                     searchable=True, vector_search_dimensions=3072, vector_search_profile_name="myHnswProfile"),
-        SearchField(name="location", type=SearchFieldDataType.String),
-        SearchField(name="page_num", type=SearchFieldDataType.Int32),
+        SearchableField(name="location", type=SearchFieldDataType.String),
+        SearchableField(name="page_num", type=SearchFieldDataType.Int32),
     ]
 
     # https://github.com/Azure/azure-search-vector-samples/blob/main/demo-python/code/e2e-demos/azure-ai-search-e2e-build-demo.ipynb
@@ -293,8 +299,6 @@ def createnewindex(new_index_name):
         ]
     )
 
-
-
     semantic_config = SemanticConfiguration(
         name="my-semantic-config",
         prioritized_fields=SemanticPrioritizedFields(
@@ -315,11 +319,34 @@ def createnewindex(new_index_name):
 
 # Replace with your index names
 index_name = 'cogsrch-index-profile-vector'
-new_index_name = 'cogsrch-index-profile-vector_large'
+new_index_name = 'cogsrch-index-profile-vector-large'
 #https://github.com/Azure-Samples/azure-search-python-samples/blob/main/bulk-insert/bulk-insert.py
 
 # Run the conversion
 # convert_embeddings(index_name, new_index_name)
+
+def searchvector():
+    
+    # Pure Vector Search
+    query = "show me projects experience on railway construction"  
+    embedding = client.embeddings.create(input=query, model="text-embedding-3-large", 
+                                         dimensions=1536).data[0].embedding
+    
+    search_client = SearchClient(endpoint=endpoint, index_name=index_name, credential=credential)
+
+    vector_query = VectorizedQuery(vector=embedding, k_nearest_neighbors=5, fields="chunkVector")
+    
+    results = search_client.search(  
+        search_text=None,  
+        vector_queries= [vector_query],
+        select=["title", "name", "chunk"],
+    )  
+    
+    for result in results:  
+        print(f"Title: {result['title']}")  
+        print(f"Score: {result['@search.score']}")  
+        print(f"Chunk: {result['chunk']}")  
+        print(f"Name: {result['name']}\n") 
 
 def main():
     # Initialize the Search Client
@@ -331,6 +358,7 @@ def main():
 
     # https://github.com/Azure/azure-search-vector-samples/blob/main/demo-python/code/basic-vector-workflow/azure-search-vector-python-sample.ipynb
 
+    # searchvector()
     createnewindex(new_index_name)
 
     # Loop through each document and access the embeddings column
