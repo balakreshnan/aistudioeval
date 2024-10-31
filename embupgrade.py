@@ -282,7 +282,7 @@ def createnewindex(new_index_name):
             VectorSearchProfile(
                 name="myHnswProfile",
                 algorithm_configuration_name="myHnsw",
-                vectorizer="myVectorizer"
+                vectorizer_name="myVectorizer"
             )
         ],
         vectorizers=[
