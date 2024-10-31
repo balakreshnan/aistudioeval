@@ -14,8 +14,10 @@ from dotenv import load_dotenv
 # Load .env file
 load_dotenv()
 
+#https://raw.githubusercontent.com/memasanz/CogSearchOpenAIWithOutVectorSearch/refs/heads/main/cog_search.py
+
 # Azure Search Service Information
-service_name = os.getenv("AZURE_AI_SEARCH_ENDPOINT") 
+service_name = os.getenv("AZURE_AI_SEARCH_ENDPOINT_NAME") 
 index_name = "cogsrch-index-profile-vector"
 api_key = os.getenv("AZURE_AI_SEARCH_API_KEY")
 new_index_name = "cogsrch-index-profile-vector-large"
@@ -26,10 +28,17 @@ endpoint = "https://{}.search.windows.net/".format(service_name)
 #credential = AzureKeyCredential(api_key)
 credential = AzureKeyCredential(os.getenv("AZURE_AI_SEARCH_API_KEY", "")) if len(os.getenv("AZURE_AI_SEARCH_API_KEY", "")) > 0 else DefaultAzureCredential()
 
+# Function to get embedding
+def get_embedding(text, model="text-embedding-ada-002"):
+    # In newer versions, the embedding endpoint has been updated
+    embedding = openai.embeddings.create(input=text, model=model)['data'][0]['embedding']
+    return embedding
 
-def search(self, question):
-    response = openai.Embedding.create(input=question,engine="text-embedding-ada-002")
-    q_embeddings = response['data'][0]['embedding']
+def search(question):
+    response = openai.embeddings.create(input=question,model="text-embedding-ada-002")
+    #print(response)
+    #q_embeddings = response['data'][0]['embedding'][0]['embedding=']
+    q_embeddings = response.data[0].embedding
     
     if len(question) > 0:
         endpoint = "https://{}.search.windows.net/".format(service_name)
@@ -56,42 +65,36 @@ def search(self, question):
         for x in obj['value']:
             if x['@search.score'] > 0.5:
                 count += 1
-                relevant_data.append(x['content'])
-                embeddings = x['embeddings']
-                embeddings_text = x['embeddings_text']
-                file_name = x['metadata_storage_name']
+                relevant_data.append(x['chunk'])
+                embeddings = x['chunkVector']
+                embeddings_text = x['chunk']
+                file_name = x['title']
 
-                curie_search = []
-                for x in embeddings:
-                    a = np.fromstring(x[1:-1], dtype=float, sep=',')
-                    curie_search.append(a)
-                curie_list = list(curie_search)
+                # curie_search = []
+                # for x in embeddings:
+                #     a = np.fromstring(x[1:-1], dtype=float, sep=',')
+                #     curie_search.append(a)
+                # curie_list = list(curie_search)
 
-                for i in range(len(embeddings)):
-                    lst_embeddings_text.append(embeddings_text[i])
-                    lst_embeddings.append(np.fromstring(embeddings[i][1:-1], dtype=float, sep=','))
-                    lst_file_name.append(file_name)
+                # for i in range(len(embeddings)):
+                #     lst_embeddings_text.append(embeddings_text[i])
+                #     lst_embeddings.append(np.fromstring(embeddings[i][1:-1], dtype=float, sep=','))
+                #     lst_file_name.append(file_name)
             
-
-        tuples_list = []
-        metadata_list = []
-        tokencount = 0
-        for i in range(len(lst_embeddings_text)):
-            tuples_list.append((lst_embeddings_text[i], lst_embeddings[i]))
-            metadata_list.append(dict(source=lst_file_name[i]))
+            print(x['chunk'])
 
 
-        return relevant_data, count, lst_file_name, tuples_list, lst_embeddings_text, metadata_list
+        return relevant_data, count, lst_file_name
 
-def update_index_semantic(self):
+def create_index_semantic():
 
     #url = '{0}/indexes/{1}/?api-version=2021-04-30-Preview'.format(self.endpoint, self.index)
     endpoint = "https://{}.search.windows.net/".format(service_name)
-    url = '{0}/indexes/{1}/?api-version=2024-07-01'.format(endpoint, index_name)    
+    url = '{0}/indexes/{1}/?api-version=2024-07-01'.format(endpoint, new_index_name)    
     print(url)
 
     payload = json.dumps({
-    "name": index_name,
+    "name": new_index_name,
     "defaultScoringProfile": "",
     "fields": [
     {
@@ -107,7 +110,6 @@ def update_index_semantic(self):
       "indexAnalyzer": None,
       "searchAnalyzer": None,
       "analyzer": None,
-      "normalizer": None,
       "dimensions": None,
       "vectorSearchProfile": None,
       "vectorEncoding": None,
@@ -126,7 +128,6 @@ def update_index_semantic(self):
       "indexAnalyzer": None,
       "searchAnalyzer": None,
       "analyzer": None,
-      "normalizer": None,
       "dimensions": None,
       "vectorSearchProfile": None,
       "vectorEncoding": None,
@@ -145,7 +146,6 @@ def update_index_semantic(self):
       "indexAnalyzer": None,
       "searchAnalyzer": None,
       "analyzer": None,
-      "normalizer": None,
       "dimensions": None,
       "vectorSearchProfile": None,
       "vectorEncoding": None,
@@ -164,9 +164,8 @@ def update_index_semantic(self):
       "indexAnalyzer": None,
       "searchAnalyzer": None,
       "analyzer": None,
-      "normalizer": None,
       "dimensions": 1536,
-      "vectorSearchProfile": None,
+      "vectorSearchProfile": "vector-profile-1",
       "vectorEncoding": None,
       "synonymMaps": []
     },
@@ -183,7 +182,6 @@ def update_index_semantic(self):
       "indexAnalyzer": None,
       "searchAnalyzer": None,
       "analyzer": None,
-      "normalizer": None,
       "dimensions": None,
       "vectorSearchProfile": None,
       "vectorEncoding": None,
@@ -202,7 +200,6 @@ def update_index_semantic(self):
       "indexAnalyzer": None,
       "searchAnalyzer": None,
       "analyzer": None,
-      "normalizer": None,
       "dimensions": None,
       "vectorSearchProfile": None,
       "vectorEncoding": None,
@@ -221,7 +218,6 @@ def update_index_semantic(self):
       "indexAnalyzer": None,
       "searchAnalyzer": None,
       "analyzer": None,
-      "normalizer": None,
       "dimensions": None,
       "vectorSearchProfile": None,
       "vectorEncoding": None,
@@ -232,7 +228,6 @@ def update_index_semantic(self):
   "corsOptions": None,
   "suggesters": [],
   "analyzers": [],
-  "normalizers": [],
   "tokenizers": [],
   "tokenFilters": [],
   "charFilters": [],
@@ -275,7 +270,10 @@ def update_index_semantic(self):
         "exhaustiveKnnParameters": None
       }
     ],
-    "profiles": [],
+    "profiles": [{
+                "name": "vector-profile-1",
+                "algorithm": "vectorConfig"
+            }],
     "vectorizers": [],
     "compressions": []
   }
@@ -286,8 +284,10 @@ def update_index_semantic(self):
     }
 
     response = requests.request("PUT", url, headers=headers, data=payload)
+    print(response.text)
 
     if response.status_code == 201 or response.status_code == 204:
+        print('good')
         return response, True
     else:
         # print('************************')
@@ -347,3 +347,13 @@ def create_indexer(self):
     else:
         print(response.status_code)
         return response, False
+    
+def main():
+
+    #search("show me candidates for technical strategy roles")
+    #create_index_semantic()
+    # search old index and write back to new index
+
+
+if __name__ == "__main__":
+    main()
