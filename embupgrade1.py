@@ -460,7 +460,8 @@ def deepcopybulk(old_index_name, new_index_name):
     payload = json.dumps({
     "search": "*",
     "count": True,
-    "top": 1000
+    "top": 1000,
+    "skip": 0
     })
     
 
