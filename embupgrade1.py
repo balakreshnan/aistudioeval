@@ -164,7 +164,7 @@ def create_index_semantic():
       "indexAnalyzer": None,
       "searchAnalyzer": None,
       "analyzer": None,
-      "dimensions": 1536,
+      "dimensions": 3072,
       "vectorSearchProfile": "vector-profile-1",
       "vectorEncoding": None,
       "synonymMaps": []
@@ -348,11 +348,99 @@ def create_indexer(self):
         print(response.status_code)
         return response, False
     
+# Function to get embedding
+def get_embedding_large(text, model="text-embedding-3-large"):
+    # In newer versions, the embedding endpoint has been updated
+    #embedding = openai.embeddings.create(input=text, model=model)['data'][0]['embedding']
+    response = openai.embeddings.create(input=text, model=model)
+    embedding = response.data[0].embedding
+    return embedding
+
+def deepcopy(old_index_name, new_index_name):
+    #response = openai.embeddings.create(input=question,model="text-embedding-3-large")
+    #print(response)
+    #q_embeddings = response['data'][0]['embedding'][0]['embedding=']
+    #q_embeddings = response.data[0].embedding
+    
+    endpoint = "https://{}.search.windows.net/".format(service_name)
+    url = '{0}indexes/{1}/docs/search?api-version=2024-07-01'.format(endpoint, old_index_name)
+
+    print(url)
+
+    payload = json.dumps({
+    "search": "*",
+    "count": True,
+    })
+    headers = {
+    'api-key': '{0}'.format(api_key),
+    'Content-Type': 'application/json'
+    }
+
+    response = requests.request("POST", url, headers=headers, data=payload)
+    obj = response.json()
+    relevant_data = []
+    lst_embeddings_text = []
+    lst_embeddings = []
+    lst_file_name = []
+    count = 0
+    for x in obj['value']:
+        title = x['title']
+        embeddings = x['chunkVector']
+        chunk = x['chunk']
+        id = x['id']
+        title = x['title']
+        name = x['name']
+        location = x['location']
+        page_num = x['page_num']
+        # print(f"Document ID: {doc_id}, Embeddings: {embeddings}")
+        #print(f"Document ID: {doc_id}, Chunk: {chunk}, Title: {title}, Name: {name}, Location: {location}, Page Number: {page_num} \n")
+        embeddingsnew = get_embedding_large(chunk)
+
+        endpoint = "https://{}.search.windows.net/".format(service_name)
+        url = '{0}/indexes/{1}/docs/index?api-version=2024-07-01'.format(endpoint, new_index_name)
+        payload = json.dumps({
+            "value" : [
+                {
+                    "@search.action": "mergeOrUpload",
+                    "id": id,
+                    "title": title,
+                    "chunk": chunk,
+                    "chunkVector": embeddingsnew,
+                    "name": name,
+                    "location": location,
+                    "page_num": page_num
+                }
+            ]
+        })
+        headers = {
+        'api-key': '{0}'.format(api_key),
+        'Content-Type': 'application/json'
+        }
+
+        response = requests.request("POST", url, headers=headers, data=payload)
+        # print(response.text)
+        response_data = json.loads(response.text)
+
+        # Extract status and other relevant fields
+        for item in response_data["value"]:
+            key = item["key"]
+            status = item["status"]
+            error_message = item["errorMessage"]
+            status_code = item["statusCode"]
+
+            # Display the parsed information
+            print(f"Key: {key}")
+            print(f"Status: {status}")
+            print(f"Error Message: {error_message}")
+            print(f"Status Code: {status_code}")
+
+
 def main():
 
     #search("show me candidates for technical strategy roles")
-    #create_index_semantic()
+    # create_index_semantic()
     # search old index and write back to new index
+    deepcopy("cogsrch-index-profile-vector", "cogsrch-index-profile-vector-large")
 
 
 if __name__ == "__main__":
