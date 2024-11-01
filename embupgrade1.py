@@ -530,14 +530,103 @@ def deepcopybulk(old_index_name, new_index_name):
     #     print(f"Error Message: {error_message}")
     #     print(f"Status Code: {status_code}")
 
+def deepcopybulkwithfixedrows(old_index_name, new_index_name, rows=50):
+    #response = openai.embeddings.create(input=question,model="text-embedding-3-large")
+    #print(response)
+    #q_embeddings = response['data'][0]['embedding'][0]['embedding=']
+    #q_embeddings = response.data[0].embedding
+    doccount = 0
+    headers = {
+    'api-key': '{0}'.format(api_key),
+    'Content-Type': 'application/json'
+    }
+
+    # now count the number of documents in the old index
+    endpoint = "https://{}.search.windows.net/".format(service_name)
+    url = '{0}indexes/{1}/docs/$count?api-version=2024-07-01'.format(endpoint, old_index_name)
+    response = requests.request("GET", url, headers=headers)
+    print(response.text)
+    doccount = int(response.text)
+    
+    endpoint = "https://{}.search.windows.net/".format(service_name)
+    url = '{0}indexes/{1}/docs/search?api-version=2024-07-01'.format(endpoint, old_index_name)
+
+    print(url)
+    skipvalue = 0
+
+    for i in range(0, doccount, rows):
+      print('rows processing', str(i))
+
+      payload = json.dumps({
+      "search": "*",
+      "count": True,
+      "top": rows,
+      "skip": skipvalue,
+      "orderby": "id asc"
+      })
+      
+
+      response = requests.request("POST", url, headers=headers, data=payload)
+      obj = response.json()
+      relevant_data = []
+      lst_embeddings_text = []
+      lst_embeddings = []
+      lst_file_name = []
+      count = 0
+      #print(response.text)
+
+      values = []
+
+      if obj['value']:
+                
+        for x in obj['value']:
+            title = x['title']
+            embeddings = x['chunkVector']
+            chunk = x['chunk']
+            id = x['id']
+            title = x['title']
+            name = x['name']
+            location = x['location']
+            page_num = x['page_num']
+            # print(f"Document ID: {doc_id}, Embeddings: {embeddings}")
+            #print(f"Document ID: {doc_id}, Chunk: {chunk}, Title: {title}, Name: {name}, Location: {location}, Page Number: {page_num} \n")
+            embeddingsnew = get_embedding_large(chunk)
+
+            values.append({
+                        "@search.action": "mergeOrUpload",
+                        "id": id,
+                        "title": title,
+                        "chunk": chunk,
+                        "chunkVector": embeddingsnew,
+                        "name": name,
+                        "location": location,
+                        "page_num": page_num
+                    })
+        
+        #print(values)
+        payload = json.dumps({
+            "value" : values
+        })
+        #print(payload)
+        headers = {
+        'api-key': '{0}'.format(api_key),
+        'Content-Type': 'application/json'
+        }
+
+        response = requests.request("POST", url, headers=headers, data=payload)
+        # print(response.text)
+        response_data = json.loads(response.text)
+      skipvalue += rows
+
 
 def main():
 
     #search("show me candidates for technical strategy roles")
     # create_index_semantic()
     # search old index and write back to new index
-    #deepcopy("cogsrch-index-profile-vector", "cogsrch-index-profile-vector-large")
-    deepcopybulk("cogsrch-index-profile-vector", "cogsrch-index-profile-vector-large")
+    # deepcopy("cogsrch-index-profile-vector", "cogsrch-index-profile-vector-large")
+    # deepcopybulk("cogsrch-index-profile-vector", "cogsrch-index-profile-vector-large")
+    deepcopybulkwithfixedrows("cogsrch-index-profile-vector", "cogsrch-index-profile-vector-large", 50)
 
 
 if __name__ == "__main__":
