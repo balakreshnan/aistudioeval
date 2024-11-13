@@ -75,6 +75,8 @@ def processpdfwithprompt(query: str):
                     "top_n_documents": 5,
                     "query_type": selected_optionsearch,
                     "semantic_configuration": "vec-semantic-configuration",
+                    "role_information": "Please answer using retrieved documents only, and without using your knowledge. Please generate citations to retrieved documents for every claim in your answer. If the user question cannot be answered using retrieved documents, please explain the reasoning behind why documents are relevant to user queries. In any case, don't answer using your own knowledge",
+                    "strictness": 5,
                     "embedding_dependency": {
                         "type": "deployment_name",
                         "deployment_name": "text-embedding-ada-002"
