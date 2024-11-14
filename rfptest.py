@@ -29,7 +29,9 @@ model_name = os.getenv("AZURE_OPENAI_DEPLOYMENT")
 
 
 def main():
-    citationtxt = extractrfpresults("Provide summary of Resources for Railway projects with 200 words?")
+    #citationtxt = extractrfpresults("Provide summary of Resources for Railway projects with 200 words?")
+    #citationtxt = extractrfpresults("Provide summary of Resources for Railway construction projects with 200 words?")
+    citationtxt = extractrfpresults("Provide summary of Resources for Construction projects with 200 words?")
 
     print('Citation Text:', citationtxt)
 
