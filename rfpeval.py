@@ -199,7 +199,8 @@ async def test_protected_material():
         output_path="./myfilteredevalresults.json",
     )
 
-async def xpia_callback(
+
+async def xpia_callback_old(
     messages: List[Dict], stream: bool = False, session_state: Optional[str] = None, context: Optional[Dict] = None
 ) -> dict:
     messages_list = messages["messages"]
@@ -244,6 +245,35 @@ async def xpia_callback(
         "role": "assistant",
         "context": {},
     }
+    messages["messages"].append(formatted_response)
+    return {"messages": messages["messages"], "stream": stream, "session_state": session_state, "context": context}
+
+async def xpia_callback(
+    messages: List[Dict], stream: bool = False, session_state: Optional[str] = None, context: Optional[Dict] = None
+) -> dict:
+    messages_list = messages["messages"]
+    # get last message
+    latest_message = messages_list[-1]
+    query = latest_message["content"]
+    context = None
+    if "file_content" in messages["template_parameters"]:
+        query += messages["template_parameters"]["file_content"]
+ 
+    try:
+        response = call_endpoint(query)
+        formatted_response = {
+            "content": response["choices"][0]["message"]["content"],
+            "role": "assistant",
+            "context": {context},
+        }
+    except Exception as e:
+        print(f"Error: {e} with content length {len(query)}")
+        # to continue the conversation, return the messages, else you can fail the adversarial with an exception
+        formatted_response = {
+            "content": "Something went wrong. Check the exception e for more details.",
+            "role": "assistant",
+            "context": None,
+        }    
     messages["messages"].append(formatted_response)
     return {"messages": messages["messages"], "stream": stream, "session_state": session_state, "context": context}
 
