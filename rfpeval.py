@@ -560,10 +560,11 @@ def evalmetrics():
     print("Done")
 
 def main():
-    #evalmetrics()
-    #asyncio.run(test_protected_material())
-    asyncio.run(jailbreak())
-    #asyncio.run(adversial_simulation())
+    evalmetrics()
+    asyncio.run(test_protected_material())
+    #https://github.com/Azure-Samples/azureai-samples/blob/main/scenarios/evaluate/evaluate_safety_risk/evaluate_safety_risk.ipynb
+    #asyncio.run(jailbreak())
+    asyncio.run(adversial_simulation())
 
 if __name__ == "__main__":    
     main()
