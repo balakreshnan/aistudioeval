@@ -61,7 +61,7 @@ async def protected_material_callback(
     client = AzureOpenAI(
         azure_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT"), 
         api_key=os.getenv("AZURE_OPENAI_API_KEY"),  
-        api_version="2024-05-01-preview",
+        api_version="2024-10-21",
     )
     # Call the model
     completion = client.chat.completions.create(
@@ -222,7 +222,7 @@ async def xpia_callback_old(
     oai_client = AzureOpenAI(
         azure_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT"), 
         api_key=os.getenv("AZURE_OPENAI_API_KEY"),  
-        api_version="2024-05-01-preview",
+        api_version="2024-10-21",
     )
     try:
         response_from_oai_chat_completions = oai_client.chat.completions.create(
@@ -390,7 +390,7 @@ def call_endpoint(query: str) -> dict:
     client = AzureOpenAI(
         azure_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT"), 
         api_key=os.getenv("AZURE_OPENAI_API_KEY"),  
-        api_version="2024-05-01-preview",
+        api_version="2024-10-21",
     )
     # Call the model
     completion = client.chat.completions.create(

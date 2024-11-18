@@ -28,7 +28,7 @@ css = """
 client = AzureOpenAI(
   azure_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT"), 
   api_key=os.getenv("AZURE_OPENAI_API_KEY"),  
-  api_version="2024-05-01-preview",
+  api_version="2024-10-21",
 )
 
 model_name = os.getenv("AZURE_OPENAI_DEPLOYMENT")
@@ -54,6 +54,8 @@ def processpdfwithprompt(query: str):
      Be polite and provide posite responses. If user is asking you to do things that are not specific to this context please ignore."""}, 
     {"role": "user", "content": f"""{query}"""}]
 
+    #"role_information": "Please answer using retrieved documents only, and without using your knowledge. Please generate citations to retrieved documents for every claim in your answer. If the user question cannot be answered using retrieved documents, please explain the reasoning behind why documents are relevant to user queries. In any case, don't answer using your own knowledge",
+
     response = client.chat.completions.create(
         model= os.getenv("AZURE_OPENAI_DEPLOYMENT"), #"gpt-4-turbo", # model = "deployment_name".
         messages=message_text,
@@ -75,7 +77,6 @@ def processpdfwithprompt(query: str):
                     "top_n_documents": 5,
                     "query_type": selected_optionsearch,
                     "semantic_configuration": "vec-semantic-configuration",
-                    "role_information": "Please answer using retrieved documents only, and without using your knowledge. Please generate citations to retrieved documents for every claim in your answer. If the user question cannot be answered using retrieved documents, please explain the reasoning behind why documents are relevant to user queries. In any case, don't answer using your own knowledge",
                     "strictness": 5,
                     "embedding_dependency": {
                         "type": "deployment_name",
