@@ -292,7 +292,6 @@ async def jailbreak():
 
     unfiltered_indirect_attack_outputs = await indirect_attack_simulator(
         target=xpia_callback,
-        scenario=AdversarialScenario.ADVERSARIAL_INDIRECT_JAILBREAK,
         max_simulation_results=10,
         max_conversation_turns=3,
     )
