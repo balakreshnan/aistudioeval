@@ -562,7 +562,10 @@ def main():
     evalmetrics()
     asyncio.run(test_protected_material())
     #https://github.com/Azure-Samples/azureai-samples/blob/main/scenarios/evaluate/evaluate_safety_risk/evaluate_safety_risk.ipynb
-    #asyncio.run(jailbreak())
+    try:
+        asyncio.run(jailbreak())
+    except Exception as e:
+        pass
     asyncio.run(adversial_simulation())
 
 if __name__ == "__main__":    
